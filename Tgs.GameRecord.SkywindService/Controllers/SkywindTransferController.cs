@@ -26,7 +26,7 @@ public class SkywindTransferController : ControllerBase
     ///         "username": "PGT_brand_api_stg",
     ///         "password": "ArSg5e6CR2g1wIgB",
     ///         "startDate": "2022-08-25T11:00:00+08:00",
-    ///         "endDate": "2022-08-25T12:00:00+08:00",
+    ///         "endDate": "2022-08-25T12:00:00+08:00"
     ///     }
     /// </remarks>
     [HttpPost]

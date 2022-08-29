@@ -31,7 +31,7 @@ internal class GamePullRecordCommandService : ICommandService<GamePullRecordComm
         {
             bool success = true;
             var playerModel = await _utensil.GetPlayerAsync(record.PlayerCode).ConfigureAwait(false);
-            var gameId = await _utensil.GetGameIdAsync(command.GameProviderId, record.RoundId).ConfigureAwait(false);
+            var gameId = await _utensil.GetGameIdAsync(command.GameProviderId, record.GameCode).ConfigureAwait(false);
             if (playerModel == null || !gameId.HasValue)
             {
                 success = false;

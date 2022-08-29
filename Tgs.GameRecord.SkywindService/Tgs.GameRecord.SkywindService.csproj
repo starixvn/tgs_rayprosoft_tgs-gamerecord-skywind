@@ -9,7 +9,12 @@
 		<GlobalNugetConfig>$(UserProfile)\AppData\Roaming\NuGet\NuGet.Config</GlobalNugetConfig>
 		<GlobalNugetConfig Condition="'$(UserProfile)'==''">$(HOME)/.nuget/NuGet/NuGet.Config</GlobalNugetConfig>
 		<DockerfileBuildArguments>--build-arg "BuildConfiguration=$(Configuration)" --secret id=nuget,src="$(GlobalNugetConfig)"</DockerfileBuildArguments>
-		<DockerfileTag Condition="$(DockerfileTag) == ''">game/gamerecord-evo-service</DockerfileTag>
+		<DockerfileTag Condition="$(DockerfileTag) == ''">game/gamerecord-sw-service</DockerfileTag>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+		<NoWarn>$(NoWarn);1591;0063</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -28,7 +33,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Tgs.GameRecord.SkywindService.Core\Tgs.GameRecord.SkywindService.Core.csproj" />
+		<ProjectReference Include="..\Tgs.GameRecord.SkywindService.Core\Tgs.GameRecord.SkywindService.Core.csproj" />
 	</ItemGroup>
 
 </Project>

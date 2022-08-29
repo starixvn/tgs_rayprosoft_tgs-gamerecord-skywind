@@ -4,7 +4,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddGameRecordEvolutionService(
+    public static IServiceCollection AddGameRecordService(
         this IServiceCollection services,
         Action<RedisOptions, IServiceProvider> redisDBconfigure)
         => services

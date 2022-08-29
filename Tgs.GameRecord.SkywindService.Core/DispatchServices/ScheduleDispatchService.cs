@@ -27,7 +27,7 @@ internal class ScheduleDispatchService : ICommandService<ScheduleDispatchCommand
 
     public async ValueTask ExecuteAsync(ScheduleDispatchCommand command, CancellationToken cancellationToken = default)
     {
-        var key = $"GameRecord:EvolutionService:{_gameRecordInfoOptions.GameProviderCode}:{command.Username}".ToLower();
+        var key = $"gp:gamerecord:{_gameRecordInfoOptions.GameProviderCode}:{command.Username}".ToLower();
         if (!await _scheduleDispatch.ExistAsync(key: key).ConfigureAwait(false))
         {
             if (await _scheduleDispatch.LockingAsync(key: key, command: command).ConfigureAwait(false))

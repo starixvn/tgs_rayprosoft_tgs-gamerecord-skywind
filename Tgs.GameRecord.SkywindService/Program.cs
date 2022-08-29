@@ -36,13 +36,13 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddMemoryCache();
 
-builder.Services.AddGameRecordEvolutionService((options, sp) =>
+builder.Services.AddGameRecordService((options, sp) =>
 {
     var configuration = sp.GetRequiredService<IConfiguration>();
     options.ConnectionString = configuration.GetConnectionString("Redis");
 });
 
-builder.Services.AddGameRecordEvolutionServiceCore((options, sp) =>
+builder.Services.AddGameRecordCore((options, sp) =>
 {
     var configuration = sp.GetRequiredService<IConfiguration>();
     configuration.GetSection("GameRecordInfo").Bind(options);

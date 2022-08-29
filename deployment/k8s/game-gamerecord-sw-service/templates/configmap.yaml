@@ -14,7 +14,7 @@ data:
       },
       "GameRecord": {
          "GameProvidersQueryServerBaseUrl": "http://game-gameprovider-queryserver/",
-         "GameInterfaceEvolutionBaseUrl": "http://game-gameinterface-evolution-service:9090/"
+         "GameInterfaceEvolutionBaseUrl": "http://game-gameinterface-sw-service:9090/"
       }
     }
   monitor.settings.json: |

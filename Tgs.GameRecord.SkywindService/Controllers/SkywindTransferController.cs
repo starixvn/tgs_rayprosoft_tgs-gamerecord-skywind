@@ -21,12 +21,12 @@ public class SkywindTransferController : ControllerBase
     ///     Post
     ///
     ///     {
-    ///         "apiUrl": "https://api.gcpstg.m27613.com/",
+    ///         "gameApiUrl": "https://api.gcpstg.m27613.com/",
     ///         "secretKey": "66a44892-54dc-488b-b755-1d1da4f8ad61",
     ///         "username": "PGT_brand_api_stg",
     ///         "password": "ArSg5e6CR2g1wIgB",
-    ///         "start": "2022-08-25T11:00:00+08:00",
-    ///         "end": "2022-08-25T12:00:00+08:00",
+    ///         "startDate": "2022-08-25T11:00:00+08:00",
+    ///         "endDate": "2022-08-25T12:00:00+08:00",
     ///     }
     /// </remarks>
     [HttpPost]

@@ -51,7 +51,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: tgs-connections
-                  key: mongo-gp-scheduler-messaging
+                  key: mongo-messaging
             - name: ConnectionStrings__Redis
               valueFrom:
                 secretKeyRef:

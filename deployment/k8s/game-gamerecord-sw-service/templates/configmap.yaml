@@ -2,7 +2,8 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: configmap-{{ include "game-gamerecord-sw-service.name" . }}
-  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "game-gamerecord-sw-service.labels" . | nindent 4 }}
 data:
   appsettings.json: |
     {

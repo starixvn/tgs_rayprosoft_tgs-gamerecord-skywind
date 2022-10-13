@@ -1,6 +1,6 @@
-﻿namespace Tgs.GameRecord.SkywindService;
+﻿namespace Tgs.GameRecord.SkywindManualService.ViewModels;
 
-public record ManualMessageRequest(
+public record GameRecordQueryViewModel(
     Uri GameApiUrl,
     string SecretKey,
     string Username,

@@ -8,6 +8,8 @@ data:
   appsettings.json: |
     {
       "GameRecordInfo": {
+        "MongoDefine": "gp.gamerecord.database",
+        "MongoGlobPattern": "tgs.gp.gamerecord.database.round.swtf",
         "GameProviderCode": "SWTF",
         "MinimumIntervalMinute": 1,
         "IntervalMinute": 3,

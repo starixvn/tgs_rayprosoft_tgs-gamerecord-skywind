@@ -4,6 +4,7 @@ using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Tgs.GameRecord.SkywindService;
+using Tgs.GameRecord.SkywindService.Core;
 using Tgs.MessageQueue.MongoDB.Configuration;
 using MongoMessageQueue = MongoDB.Messaging.MessageQueue;
 
@@ -38,30 +39,29 @@ builder.Services.AddSwaggerGen(c =>
     foreach (var xmlFileName in xmlFileNames) c.IncludeXmlComments(xmlFileName);
 });
 
-builder.Services.AddMemoryCache();
+builder.Services.AddGameRecordCore(
+    (options, sp) =>
+    {
+        var configuration = sp.GetRequiredService<IConfiguration>();
+        options.ConnectionString = configuration.GetConnectionString("Redis");
+    },
+    (options, sp) =>
+    {
+        var configuration = sp.GetRequiredService<IConfiguration>();
+        configuration.GetSection("GameRecordInfo").Bind(options);
+    },
+    (options, sp) =>
+    {
+        var configuration = sp.GetRequiredService<IConfiguration>();
+        options.BaseUrl = configuration.GetValue<Uri>("GameRecord:GameInterfaceSkywindBaseUrl");
+    },
+    (options, sp) =>
+    {
+        var configuration = sp.GetRequiredService<IConfiguration>();
+        options.BaseUrl = configuration.GetValue<Uri>("GameRecord:GameProvidersQueryServerBaseUrl");
+    });
 
-builder.Services.AddGameRecordService((options, sp) =>
-{
-    var configuration = sp.GetRequiredService<IConfiguration>();
-    options.ConnectionString = configuration.GetConnectionString("Redis");
-});
-
-builder.Services.AddGameRecordCore((options, sp) =>
-{
-    var configuration = sp.GetRequiredService<IConfiguration>();
-    configuration.GetSection("GameRecordInfo").Bind(options);
-},
-(options, sp) =>
-{
-    var configuration = sp.GetRequiredService<IConfiguration>();
-    options.BaseUrl = configuration.GetValue<Uri>("GameRecord:GameInterfaceSkywindBaseUrl");
-},
-(options, sp) =>
-{
-    var configuration = sp.GetRequiredService<IConfiguration>();
-    options.BaseUrl = configuration.GetValue<Uri>("GameRecord:GameProvidersQueryServerBaseUrl");
-},
-(sp) => sp.GetRequiredService<RedisConnectionManager>().Database);
+var gameRecordInfo = builder.Configuration.GetSection("GameRecordInfo").Get<GameRecordInfoOptions>();
 
 builder.Services
     .AddMessageQueue()
@@ -69,7 +69,7 @@ builder.Services
     {
         _ = config
         .DefineMessageQueue(
-            "gp.gamerecord.database",
+            gameRecordInfo.MongoDefine,
             sp => new MongoMessageQueueBuilderOptions
             {
                 MessageQueue = MongoMessageQueue.Default,
@@ -84,11 +84,10 @@ builder.Services
              var configuration = sp.GetRequiredService<IConfiguration>();
              options.Url = configuration.GetConnectionString("Nats");
          })
-         .AddHandler<ScheduleMessageHandler>("gp.gamerecord.schedule.swtf", "gp.gamerecord.schedule")
-         .AddProcessor<ManualMessageHandler>("gp.gamerecord.manual.swtf", "gp.gamerecord.manual");
+         .AddHandler<ScheduleMessageHandler>("gp.gamerecord.schedule.swtf", "gp.gamerecord.schedule");
      })
      .ClearAllExchanges()
-     .AddMongoGlobPatternExchange("tgs.gp.gamerecord.database.round.swtf", "gp.gamerecord.database", "tgs.gp.gamerecord.database.round.swtf");
+     .AddMongoGlobPatternExchange(gameRecordInfo.MongoGlobPattern, gameRecordInfo.MongoDefine, gameRecordInfo.MongoGlobPattern);
 
 builder.Services
      .AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
@@ -122,6 +121,7 @@ builder.Services
                 || !httpContext.Request.Path.StartsWithSegments("/swagger")
                 && !httpContext.Request.Path.StartsWithSegments("/healthz")
                 && !httpContext.Request.Path.StartsWithSegments("/profiler/")
+                && !httpContext.Request.Path.StartsWithSegments("/metrics")
                 && !new[] { "html", "ico", "png", "jpg" }.Any(
                     ext => httpContext.Request.Path.Value.EndsWith($".{ext}"));
         };

@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Tgs.GameRecord.SkywindManualService.ViewModels;
 using Tgs.GameRecord.SkywindService.Core.WorkerServices;
-using Tgs.GameRecord.SkywindService.ViewModels;
 using Tgs.ServiceUtility;
 
-namespace Tgs.GameRecord.SkywindService.Controllers;
+namespace Tgs.GameRecord.SkywindManualService.Controllers;
 
 [ApiController]
 [Route("swtf")]

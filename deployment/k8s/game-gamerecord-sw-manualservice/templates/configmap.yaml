@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-{{ include "game-gamerecord-sw-manualservice.name" . }}
+  labels:
+    {{- include "game-gamerecord-sw-manualservice.labels" . | nindent 4 }}
+data:
+  appsettings.json: |
+    {
+      "GameRecordInfo": {
+        "MongoDefine": "gp.gamerecord.database.manual",
+        "MongoGlobPattern": "tgs.gp.gamerecord.database.manual.swtf",
+        "GameProviderCode": "SWTF",
+        "MinimumIntervalMinute": 1,
+        "IntervalMinute": 3,
+        "LockMinute": 1.5
+      },
+      "GameRecord": {
+         "GameProvidersQueryServerBaseUrl": "http://game-gameprovider-queryserver/",
+         "GameInterfaceSkywindBaseUrl": "http://game-gameinterface-sw-service:9090/"
+      }
+    }
+  monitor.settings.json: |
+    {
+      "Metrics": {
+        "MetricCount": "1"
+      },
+      "Logging":{
+        "Console": {
+          "FormatterName": "json"
+        },
+        "LogLevel": {
+          "Default": "Warning",
+          "Microsoft": "Warning",
+          "Microsoft.Diagnostics": "Warning",
+          "Microsoft.Hosting.Lifetime": "Information"
+        }
+      }
+    }

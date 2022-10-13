@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
-namespace Tgs.GameRecord.SkywindService;
+namespace Tgs.GameRecord.SkywindService.Core;
 
 internal class RedisConnectionManager : IDisposable
 {

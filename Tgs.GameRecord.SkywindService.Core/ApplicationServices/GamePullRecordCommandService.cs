@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
+using Tgs.GameRounds.Common;
+using Tgs.GameRounds.Common.MessageModels;
 using Tgs.MessageQueue;
 using Tgs.ServiceUtility;
 
@@ -9,9 +11,10 @@ namespace Tgs.GameRecord.SkywindService.Core.ApplicationServices;
 internal class GamePullRecordCommandService : ICommandService<GamePullRecordCommand>
 {
     private readonly ILogger<GamePullRecordCommandService> _logger;
-    private readonly GameRecordInfoOptions _gameRecordInfoOptions;
+    private readonly GameRecordInfoOptions _gameRecordInfo;
     private readonly IMessageSender _messageSender;
     private readonly IUtensil _utensil;
+    private readonly string _subject;
 
     public GamePullRecordCommandService(
         ILogger<GamePullRecordCommandService> logger,
@@ -20,9 +23,10 @@ internal class GamePullRecordCommandService : ICommandService<GamePullRecordComm
         IUtensil utensil)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _gameRecordInfoOptions = options.Value;
+        _gameRecordInfo = options.Value;
         _messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
         _utensil = utensil ?? throw new ArgumentNullException(nameof(utensil));
+        _subject = _gameRecordInfo.MongoGlobPattern;
     }
 
     public async ValueTask ExecuteAsync(GamePullRecordCommand command, CancellationToken cancellationToken = default)
@@ -49,37 +53,35 @@ internal class GamePullRecordCommandService : ICommandService<GamePullRecordComm
 
             var playerWinLoss = record.Win.ToDecimal() - record.Bet.ToDecimal();
 
-            var data = new GameRoundData(
+            var data = new GameRecordMessage(
                 ExternalRoundId: record.RoundId,
                 GameProviderId: command.GameProviderId,
                 GameProviderCode: command.GameProviderCode,
-                PlayerCode: (playerModel == null) ? string.Empty : playerModel.PlayerCode,
                 GameId: gameId ?? -1,
                 ExternalGameId: record.GameCode,
+                PlayerCode: (playerModel == null) ? string.Empty : playerModel.PlayerCode,
                 CurrencyCode: (playerModel == null) ? string.Empty : playerModel.DefaultWalletCurrencyCode,
-                Status: GameRoundStatus.Closed,
-                GameProviderConfigurationId: gameProviderConfigurationId ?? Guid.Empty,
                 WalletId: (playerModel == null) ? Guid.Empty : playerModel.DefaultWalletId,
+                BrandId: (playerModel == null) ? Guid.Empty : playerModel.BrandId,
+                GameProviderConfigurationId: gameProviderConfigurationId ?? Guid.Empty,
+                Status: GameRoundStatus.Closed,
+                ClientStatus: (playerWinLoss > 0) ? GameRoundClientStatus.Win : GameRoundClientStatus.Loss,
                 ExternalCreatedOn: DateTimeOffset.Parse(record.FirstTs),
                 ExternalClosedOn: DateTimeOffset.Parse(record.Ts),
-                BrandId: (playerModel == null) ? Guid.Empty : playerModel.BrandId,
-                BetAmount: record.Bet.ToDecimal(),
-                ValidBetAmount: record.Bet.ToDecimal(),
-                SettleAmount: record.Win.ToDecimal(),
+                BetAmount: record.Bet.ToDecimal().GetValueOrDefault(0),
+                ValidBetAmount: record.Bet.ToDecimal().GetValueOrDefault(0),
+                SettleAmount: record.Win.ToDecimal().GetValueOrDefault(0),
                 Commission: 0,
-                Turnover: record.Bet.ToDecimal(),
-                PlayerWinLoss: playerWinLoss,
+                Turnover: record.Bet.ToDecimal().GetValueOrDefault(0),
+                PlayerWinLoss: playerWinLoss.GetValueOrDefault(0),
                 AdditionalData: record.AdditionalData,
-                ClientStatus: (playerWinLoss > 0) ? GameRoundClientStatus.Win : GameRoundClientStatus.Loss,
                 Success: success);
 
-            var subject = $"tgs.gp.gamerecord.database.round.{_gameRecordInfoOptions.GameProviderCode}".ToLower();
-
-            _logger.LogInformation("LogOn:{logOn}  Subject:{subject} MessageRequest:{request}", DateTime.Now.ToString("o"), subject, data);
+            _logger.LogInformation("LogOn:{logOn}  Subject:{subject} MessageRequest:{request}", DateTime.Now.ToString("o"), _subject, data);
 
             await _messageSender
                     .PublishAsync(
-                        subject: $"tgs.gp.gamerecord.database.round.{_gameRecordInfoOptions.GameProviderCode}".ToLower(),
+                        subject: _subject,
                         data: data.ToBson(),
                         cancellationToken: cancellationToken)
                     .ConfigureAwait(false);

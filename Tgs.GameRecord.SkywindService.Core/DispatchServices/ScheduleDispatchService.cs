@@ -7,6 +7,7 @@ namespace Tgs.GameRecord.SkywindService.Core.DispatchServices;
 internal class ScheduleDispatchService : ICommandService<ScheduleDispatchCommand>
 {
     private readonly ICommandService<SkywindSettleWorkerCommand> _commandService;
+    private readonly ICommandService<Skywind3rdPartyWorkerCommand> _partycommandService;
     private readonly GameRecordInfoOptions _gameRecordInfoOptions;
     private readonly double _intervalMinute;
     private readonly IScheduleDispatch _scheduleDispatch;
@@ -14,11 +15,13 @@ internal class ScheduleDispatchService : ICommandService<ScheduleDispatchCommand
     public ScheduleDispatchService(
         IOptions<GameRecordInfoOptions> options,
         ICommandService<SkywindSettleWorkerCommand> commandService,
+        ICommandService<Skywind3rdPartyWorkerCommand> partycommandService,
         IScheduleDispatch scheduleDispatch
         )
     {
         _gameRecordInfoOptions = options.Value;
         _commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
+        _partycommandService = partycommandService ?? throw new ArgumentNullException(nameof(partycommandService));
         _scheduleDispatch = scheduleDispatch ?? throw new ArgumentNullException(nameof(scheduleDispatch));
         _intervalMinute = (_gameRecordInfoOptions.IntervalMinute < _gameRecordInfoOptions.MinimumIntervalMinute)
                         ? _gameRecordInfoOptions.MinimumIntervalMinute
@@ -39,6 +42,14 @@ internal class ScheduleDispatchService : ICommandService<ScheduleDispatchCommand
                     var startDate = endDate.AddMinutes(_intervalMinute * -1);
 
                     await _commandService.ExecuteAsync(new SkywindSettleWorkerCommand(
+                         GameApiUrl: command.GameApiUrl,
+                         SecretKey: command.SecretKey,
+                         Username: command.Username,
+                         Password: command.Password,
+                         StartDate: startDate,
+                         EndDate: endDate), cancellationToken: cancellationToken).ConfigureAwait(false);
+
+                    await _partycommandService.ExecuteAsync(new Skywind3rdPartyWorkerCommand(
                          GameApiUrl: command.GameApiUrl,
                          SecretKey: command.SecretKey,
                          Username: command.Username,

@@ -13,6 +13,7 @@ public class SkywindTransferController : ControllerBase
     /// Executes the asynchronous.
     /// </summary>
     /// <param name="service">The service.</param>
+    /// <param name="partycommandService">The partycommand service.</param>
     /// <param name="model">The model.</param>
     /// <returns></returns>
     /// <remarks>
@@ -30,14 +31,29 @@ public class SkywindTransferController : ControllerBase
     ///     }
     /// </remarks>
     [HttpPost]
-    public ValueTask ExecuteAsync(
+    public async ValueTask ExecuteAsync(
         [FromServices] ICommandService<SkywindSettleWorkerCommand> service,
+        [FromServices] ICommandService<Skywind3rdPartyWorkerCommand> partycommandService,
         GameRecordQueryViewModel model)
-        => service.ExecuteAsync(new SkywindSettleWorkerCommand(
-            GameApiUrl: model.GameApiUrl,
-            SecretKey: model.SecretKey,
-            Username: model.Username,
-            Password: model.Password,
-            StartDate: model.StartDate,
-            EndDate: model.EndDate));
+    {
+        await service
+            .ExecuteAsync(new SkywindSettleWorkerCommand(
+                GameApiUrl: model.GameApiUrl,
+                SecretKey: model.SecretKey,
+                Username: model.Username,
+                Password: model.Password,
+                StartDate: model.StartDate,
+                EndDate: model.EndDate))
+            .ConfigureAwait(false);
+
+        await partycommandService
+            .ExecuteAsync(new Skywind3rdPartyWorkerCommand(
+                GameApiUrl: model.GameApiUrl,
+                SecretKey: model.SecretKey,
+                Username: model.Username,
+                Password: model.Password,
+                StartDate: model.StartDate,
+                EndDate: model.EndDate))
+            .ConfigureAwait(false);
+    }
 }

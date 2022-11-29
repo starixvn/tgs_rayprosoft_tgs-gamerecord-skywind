@@ -35,7 +35,7 @@ internal class GamePullRecordCommandService : ICommandService<GamePullRecordComm
         {
             bool success = true;
             var playerModel = await _utensil.GetPlayerAsync(record.PlayerCode).ConfigureAwait(false);
-            var gameId = await _utensil.GetGameIdAsync(command.GameProviderId, record.GameCode).ConfigureAwait(false);
+            var gameId = await _utensil.GetGameIdAsync(command.GameProviderId, record.ExternalGameId).ConfigureAwait(false);
             if (playerModel == null || !gameId.HasValue)
             {
                 success = false;
@@ -51,29 +51,27 @@ internal class GamePullRecordCommandService : ICommandService<GamePullRecordComm
                 }
             }
 
-            var playerWinLoss = record.Win.ToDecimal() - record.Bet.ToDecimal();
-
             var data = new GameRecordMessage(
-                ExternalRoundId: record.RoundId,
+                ExternalRoundId: record.ExternalRoundId,
                 GameProviderId: command.GameProviderId,
                 GameProviderCode: command.GameProviderCode,
                 GameId: gameId ?? -1,
-                ExternalGameId: record.GameCode,
+                ExternalGameId: record.ExternalGameId,
                 PlayerCode: (playerModel == null) ? string.Empty : playerModel.PlayerCode,
                 CurrencyCode: (playerModel == null) ? string.Empty : playerModel.DefaultWalletCurrencyCode,
                 WalletId: (playerModel == null) ? Guid.Empty : playerModel.DefaultWalletId,
                 BrandId: (playerModel == null) ? Guid.Empty : playerModel.BrandId,
                 GameProviderConfigurationId: gameProviderConfigurationId ?? Guid.Empty,
                 Status: GameRoundStatus.Closed,
-                ClientStatus: (playerWinLoss > 0) ? GameRoundClientStatus.Win : GameRoundClientStatus.Loss,
-                ExternalCreatedOn: DateTimeOffset.Parse(record.FirstTs),
-                ExternalClosedOn: DateTimeOffset.Parse(record.Ts),
+                ClientStatus: (record.PlayerWinLoss > 0) ? GameRoundClientStatus.Win : GameRoundClientStatus.Loss,
+                ExternalCreatedOn: record.ExternalCreatedOn.ToDateTimeOffset(),
+                ExternalClosedOn: record.ExternalClosedOn.ToDateTimeOffset(),
                 BetAmount: record.Bet.ToDecimal().GetValueOrDefault(0),
                 ValidBetAmount: record.Bet.ToDecimal().GetValueOrDefault(0),
-                SettleAmount: record.Win.ToDecimal().GetValueOrDefault(0),
+                SettleAmount: record.Settle.ToDecimal().GetValueOrDefault(0),
                 Commission: 0,
                 Turnover: record.Bet.ToDecimal().GetValueOrDefault(0),
-                PlayerWinLoss: playerWinLoss.GetValueOrDefault(0),
+                PlayerWinLoss: record.PlayerWinLoss.ToDecimal().GetValueOrDefault(0),
                 AdditionalData: record.AdditionalData,
                 Success: success);
 

@@ -9,10 +9,14 @@ namespace Tgs.GameRecord.SkywindManualService;
 public class ManualMessageHandler : IMessageProcessor
 {
     private readonly ICommandService<SkywindSettleWorkerCommand> _service;
+    private readonly ICommandService<Skywind3rdPartyWorkerCommand> _partycommandService;
 
-    public ManualMessageHandler(ICommandService<SkywindSettleWorkerCommand> service)
+    public ManualMessageHandler(
+        ICommandService<SkywindSettleWorkerCommand> service,
+        ICommandService<Skywind3rdPartyWorkerCommand> partycommandService)
     {
         _service = service ?? throw new ArgumentNullException(nameof(service));
+        _partycommandService = partycommandService ?? throw new ArgumentNullException(nameof(partycommandService));
     }
 
     public async ValueTask<ReadOnlyMemory<byte>> HandleAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
@@ -30,6 +34,18 @@ public class ManualMessageHandler : IMessageProcessor
 
         await _service.ExecuteAsync(
             command: gameRecordCommand,
+            cancellationToken: cancellationToken).ConfigureAwait(false);
+
+        var partyWorkerCommand = new Skywind3rdPartyWorkerCommand(
+            GameApiUrl: request.GameApiUrl,
+            SecretKey: request.SecretKey,
+            Username: request.Username,
+            Password: request.Password,
+            StartDate: request.StartDate,
+            EndDate: request.EndDate);
+
+        await _partycommandService.ExecuteAsync(
+            command: partyWorkerCommand,
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
         var response = new ManualMessageResponse(true);

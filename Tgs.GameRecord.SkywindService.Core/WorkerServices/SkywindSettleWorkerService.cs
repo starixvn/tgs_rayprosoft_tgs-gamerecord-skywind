@@ -34,7 +34,7 @@ internal class SkywindSettleWorkerService : ICommandService<SkywindSettleWorkerC
     {
         var gameProviderId = await _utensil.GetGameProviderIdAsync(_gameRecordInfo.GameProviderCode).ConfigureAwait(false);
         var offset = 0;
-        var limit = 100;
+        var limit = 1000;
 
         while (true)
         {

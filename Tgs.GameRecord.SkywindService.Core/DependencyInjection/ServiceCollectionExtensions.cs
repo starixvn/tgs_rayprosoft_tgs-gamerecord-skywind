@@ -24,7 +24,6 @@ public static class ServiceCollectionExtensions
             .AddOptions<MongoSettingOptions>()
             .Configure(mongoSettingOptions)
             .Services
-
             .RegisterAllServiceUtilityTypes(
                 Assembly.GetExecutingAssembly(),
                 ServiceLifetime.Transient)

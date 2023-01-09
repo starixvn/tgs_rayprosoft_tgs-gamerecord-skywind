@@ -7,9 +7,9 @@ namespace Tgs.GameRecord.SkywindService.Core.DispatchServices;
 internal class ScheduleDispatchService : ICommandService<ScheduleDispatchCommand>
 {
     private readonly ICommandService<SkywindSettleWorkerCommand> _commandService;
-    private readonly ICommandService<Skywind3rdPartyWorkerCommand> _partycommandService;
     private readonly GameRecordInfoOptions _gameRecordInfoOptions;
     private readonly double _intervalMinute;
+    private readonly ICommandService<Skywind3rdPartyWorkerCommand> _partycommandService;
     private readonly IScheduleDispatch _scheduleDispatch;
 
     public ScheduleDispatchService(
@@ -23,9 +23,9 @@ internal class ScheduleDispatchService : ICommandService<ScheduleDispatchCommand
         _commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
         _partycommandService = partycommandService ?? throw new ArgumentNullException(nameof(partycommandService));
         _scheduleDispatch = scheduleDispatch ?? throw new ArgumentNullException(nameof(scheduleDispatch));
-        _intervalMinute = (_gameRecordInfoOptions.IntervalMinute < _gameRecordInfoOptions.MinimumIntervalMinute)
-                        ? _gameRecordInfoOptions.MinimumIntervalMinute
-                        : _gameRecordInfoOptions.IntervalMinute;
+        _intervalMinute = (_gameRecordInfoOptions.IntervalMinutes < _gameRecordInfoOptions.IntervalMinutesMinimum)
+                        ? _gameRecordInfoOptions.IntervalMinutesMinimum
+                        : _gameRecordInfoOptions.IntervalMinutes;
     }
 
     public async ValueTask ExecuteAsync(ScheduleDispatchCommand command, CancellationToken cancellationToken = default)

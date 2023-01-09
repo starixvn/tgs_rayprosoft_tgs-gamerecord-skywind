@@ -8,8 +8,8 @@ namespace Tgs.GameRecord.SkywindManualService;
 
 public class ManualMessageHandler : IMessageProcessor
 {
-    private readonly ICommandService<SkywindSettleWorkerCommand> _service;
     private readonly ICommandService<Skywind3rdPartyWorkerCommand> _partycommandService;
+    private readonly ICommandService<SkywindSettleWorkerCommand> _service;
 
     public ManualMessageHandler(
         ICommandService<SkywindSettleWorkerCommand> service,

@@ -14,7 +14,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "方案項目", "方案項�
 		nuget.config = nuget.config
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tgs.GameRecord.SkywindManualService", "Tgs.GameRecord.SkywindManualService\Tgs.GameRecord.SkywindManualService.csproj", "{9C9BDCE4-0810-4809-92BD-AC0490B86B51}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameRecord.SkywindManualService", "Tgs.GameRecord.SkywindManualService\Tgs.GameRecord.SkywindManualService.csproj", "{9C9BDCE4-0810-4809-92BD-AC0490B86B51}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tgs.GameRecord.SkywindService.Core.UnitTest", "Tgs.GameRecord.SkywindService.Core.UnitTest\Tgs.GameRecord.SkywindService.Core.UnitTest.csproj", "{05B15E2E-BA0D-45F8-999D-633FFFCC32DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,6 +36,10 @@ Global
 		{9C9BDCE4-0810-4809-92BD-AC0490B86B51}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C9BDCE4-0810-4809-92BD-AC0490B86B51}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C9BDCE4-0810-4809-92BD-AC0490B86B51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05B15E2E-BA0D-45F8-999D-633FFFCC32DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05B15E2E-BA0D-45F8-999D-633FFFCC32DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05B15E2E-BA0D-45F8-999D-633FFFCC32DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05B15E2E-BA0D-45F8-999D-633FFFCC32DB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

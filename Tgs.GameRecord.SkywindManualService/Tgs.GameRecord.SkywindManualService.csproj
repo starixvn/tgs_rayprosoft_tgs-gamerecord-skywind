@@ -29,10 +29,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Controllers\" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<ProjectReference Include="..\Tgs.GameRecord.SkywindService.Core\Tgs.GameRecord.SkywindService.Core.csproj" />
 	</ItemGroup>
 

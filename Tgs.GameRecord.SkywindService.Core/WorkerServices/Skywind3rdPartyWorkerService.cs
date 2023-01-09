@@ -32,7 +32,6 @@ internal class Skywind3rdPartyWorkerService : ICommandService<Skywind3rdPartyWor
 
     public async ValueTask ExecuteAsync(Skywind3rdPartyWorkerCommand command, CancellationToken cancellationToken = default)
     {
-        var gameProviderId = await _utensil.GetGameProviderIdAsync(_gameRecordInfo.GameProviderCode).ConfigureAwait(false);
         var offset = 0;
         var limit = 1000;
 
@@ -72,10 +71,11 @@ internal class Skywind3rdPartyWorkerService : ICommandService<Skywind3rdPartyWor
 
             offset += limit;
 
-            await _service.ExecuteAsync(new GamePullRecordCommand(
-                GameProviderId: gameProviderId,
-                GameProviderCode: _gameRecordInfo.GameProviderCode,
-                Records: records), cancellationToken: cancellationToken).ConfigureAwait(false);
+            await _service
+                .ExecuteAsync(
+                    command: new GamePullRecordCommand(Records: records),
+                    cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
         }
     }
 }

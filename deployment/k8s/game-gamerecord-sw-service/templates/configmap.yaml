@@ -8,16 +8,15 @@ data:
   appsettings.json: |
     {
       "GameRecordInfo": {
-        "MongoDefine": "gp.gamerecord.database",
-        "MongoGlobPattern": "tgs.gp.gamerecord.database.round.swtf",
         "GameProviderCode": "SWTF",
-        "MinimumIntervalMinute": 1,
-        "IntervalMinute": 3,
-        "LockMinute": 1.5
+        "IntervalMinutes": 3,
+        "IntervalMinutesMax": 60,
+        "IntervalMinutesMinimum": 1,
+        "LockMinute": 2
       },
       "GameRecord": {
-         "GameProvidersQueryServerBaseUrl": "http://game-gameprovider-queryserver/",
-         "GameInterfaceSkywindBaseUrl": "http://game-gameinterface-sw-service:9090/"
+         "GameCommandClientBaseUrl": "http://game-gamecommand/",
+         "GameInterfaceBaseUrl": "http://game-gameinterface-sw-service:9090/"
       }
     }
   monitor.settings.json: |

@@ -10,8 +10,9 @@
 		<PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="7.0.0" />
 		<PackageReference Include="Scrutor" Version="4.2.0" />
 		<PackageReference Include="StackExchange.Redis" Version="2.6.86" />
+		<PackageReference Include="System.Linq.Async" Version="6.0.1" />
+		<PackageReference Include="Tgs.GameCommand.Client" Version="0.0.3" />
 		<PackageReference Include="Tgs.GameInterface.SkywindService.Client" Version="0.0.4" />
-		<PackageReference Include="Tgs.GameProviders.QueryServer.Client" Version="0.0.16" />
 		<PackageReference Include="Tgs.GameRounds.Client" Version="0.0.32" />
 		<PackageReference Include="Tgs.MessageQueue" Version="2.1.1" />
 		<PackageReference Include="Tgs.MessageQueue.MongoDB" Version="2.1.2" />

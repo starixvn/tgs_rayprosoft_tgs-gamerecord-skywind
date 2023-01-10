@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Net.Mime;
+using System.Text.Json.Serialization;
+using Microsoft.Extensions.Options;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Resources;
@@ -30,7 +33,17 @@ builder.Logging
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services
+    .AddRouting(options => options.LowercaseUrls = true)
+    .AddControllers(options =>
+    {
+        options.Filters.Add(new ProducesAttribute(MediaTypeNames.Application.Json));
+        options.Filters.Add(new ConsumesAttribute(MediaTypeNames.Application.Json));
+    })
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>

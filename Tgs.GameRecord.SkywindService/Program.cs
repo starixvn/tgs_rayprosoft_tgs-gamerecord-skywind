@@ -88,7 +88,9 @@ builder.Services
          })
          .AddHandler<ScheduleFormQueuedMessageHandler>(subject: "gp.gamerecord.scheduleform.swtf.queued", "gp.gamerecord.scheduleform.swtf")
          .AddHandler<ScheduleMessageHandler>(subject: "gp.gamerecord.schedule.swtf", group: "gp.gamerecord.schedule");
-     });
+     })
+     .ClearAllExchanges()
+     .AddNatsGlobPatternExchange("*");
 
 builder.Services
     .AddOpenTelemetry()

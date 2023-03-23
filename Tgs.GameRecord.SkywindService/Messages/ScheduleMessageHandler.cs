@@ -4,7 +4,7 @@ using Tgs.GameRecord.SkywindService.Core.DispatchServices;
 using Tgs.MessageQueue;
 using Tgs.ServiceUtility;
 
-namespace Tgs.GameRecord.SkywindService;
+namespace Tgs.GameRecord.SkywindService.Messages;
 
 internal class ScheduleMessageHandler : IMessageHandler
 {

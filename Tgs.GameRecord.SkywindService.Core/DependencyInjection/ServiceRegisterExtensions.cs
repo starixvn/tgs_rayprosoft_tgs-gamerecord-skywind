@@ -6,7 +6,7 @@ using Tgs.GameRecord.SkywindService.Core;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
-public static class GameRecordRegisterExtensions
+public static class ServiceRegisterExtensions
 {
     public static async Task<WebApplication> UseGameRecordRegister(this WebApplication app)
     {
@@ -20,7 +20,7 @@ public static class GameRecordRegisterExtensions
 
             var games = client
                 .GameQueryAsync(
-                    gameProviderCode: gameRecordInfo.GameProviderCode)
+                    gameProviderCode: gameRecordInfo!.GameProviderCode)
                 .ToEnumerable()
                 ?? Enumerable.Empty<GameInfo>();
 

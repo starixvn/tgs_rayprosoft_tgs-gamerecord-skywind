@@ -1,4 +1,4 @@
-﻿namespace Tgs.GameRecord.SkywindService;
+﻿namespace Tgs.GameRecord.SkywindService.Messages;
 
 public record ScheduleMessageModel(
     Uri GameApiUrl,

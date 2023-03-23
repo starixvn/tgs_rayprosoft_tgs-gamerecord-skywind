@@ -1,67 +1,62 @@
-﻿using Microsoft.Extensions.Options;
-using Tgs.GameRecord.SkywindService.Core.WorkerServices;
+﻿using Microsoft.Extensions.Logging;
+using Tgs.GameRecord.SkywindService.Core.ApplicationServices;
 using Tgs.ServiceUtility;
 
 namespace Tgs.GameRecord.SkywindService.Core.DispatchServices;
 
 internal class ScheduleDispatchService : ICommandService<ScheduleDispatchCommand>
 {
-    private readonly ICommandService<SkywindSettleWorkerCommand> _commandService;
-    private readonly GameRecordInfoOptions _gameRecordInfoOptions;
-    private readonly double _intervalMinute;
-    private readonly ICommandService<Skywind3rdPartyWorkerCommand> _partycommandService;
-    private readonly IScheduleDispatch _scheduleDispatch;
+    private readonly ILogger<ScheduleDispatchService> _logger;
+    private readonly ICommandService<Schedule3rdPartyPullRecordCommand> _schedule3RdPartyService;
+    private readonly ICommandService<SchedulePullRecordCommand> _scheduleService;
 
     public ScheduleDispatchService(
-        IOptions<GameRecordInfoOptions> options,
-        ICommandService<SkywindSettleWorkerCommand> commandService,
-        ICommandService<Skywind3rdPartyWorkerCommand> partycommandService,
-        IScheduleDispatch scheduleDispatch
+        ILogger<ScheduleDispatchService> logger,
+        ICommandService<SchedulePullRecordCommand> scheduleService,
+        ICommandService<Schedule3rdPartyPullRecordCommand> schedule3rdPartyService
         )
     {
-        _gameRecordInfoOptions = options.Value;
-        _commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
-        _partycommandService = partycommandService ?? throw new ArgumentNullException(nameof(partycommandService));
-        _scheduleDispatch = scheduleDispatch ?? throw new ArgumentNullException(nameof(scheduleDispatch));
-        _intervalMinute = (_gameRecordInfoOptions.IntervalMinutes < _gameRecordInfoOptions.IntervalMinutesMinimum)
-                        ? _gameRecordInfoOptions.IntervalMinutesMinimum
-                        : _gameRecordInfoOptions.IntervalMinutes;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _scheduleService = scheduleService ?? throw new ArgumentNullException(nameof(scheduleService));
+        _schedule3RdPartyService = schedule3rdPartyService ?? throw new ArgumentNullException(nameof(schedule3rdPartyService));
     }
 
     public async ValueTask ExecuteAsync(ScheduleDispatchCommand command, CancellationToken cancellationToken = default)
     {
-        var key = $"gp:gamerecord:{_gameRecordInfoOptions.GameProviderCode}:{command.Username}".ToLower();
-        if (!await _scheduleDispatch.ExistAsync(key: key).ConfigureAwait(false))
-        {
-            if (await _scheduleDispatch.LockingAsync(key: key, command: command).ConfigureAwait(false))
-            {
-                try
-                {
-                    var endDate = DateTimeOffset.ParseExact(DateTimeOffset.UtcNow.ToString(@"yyyy-MM-dd\THH:mm:00K"), @"yyyy-MM-dd\THH:mm:ssK", null, styles: System.Globalization.DateTimeStyles.RoundtripKind);
+        var endDate = DateTimeOffset.ParseExact(DateTimeOffset.UtcNow.ToString(@"yyyy-MM-dd\THH:mm:00K"), @"yyyy-MM-dd\THH:mm:ssK", null, styles: System.Globalization.DateTimeStyles.RoundtripKind);
 
-                    var startDate = endDate.AddMinutes(_intervalMinute * -1);
+        var startDate = endDate.AddMinutes(3 * -1);
 
-                    await _commandService.ExecuteAsync(new SkywindSettleWorkerCommand(
-                         GameApiUrl: command.GameApiUrl,
-                         SecretKey: command.SecretKey,
-                         Username: command.Username,
-                         Password: command.Password,
-                         StartDate: startDate,
-                         EndDate: endDate), cancellationToken: cancellationToken).ConfigureAwait(false);
+        var schedulePullRecordCommand = new SchedulePullRecordCommand(
+            ApiUrl: command.GameApiUrl,
+            SecretKey: command.SecretKey,
+            Username: command.Username,
+            Password: command.Password,
+            StartDate: startDate,
+            EndDate: endDate);
 
-                    await _partycommandService.ExecuteAsync(new Skywind3rdPartyWorkerCommand(
-                         GameApiUrl: command.GameApiUrl,
-                         SecretKey: command.SecretKey,
-                         Username: command.Username,
-                         Password: command.Password,
-                         StartDate: startDate,
-                         EndDate: endDate), cancellationToken: cancellationToken).ConfigureAwait(false);
-                }
-                finally
-                {
-                    await _scheduleDispatch.UnlockAsync(key: key).ConfigureAwait(false);
-                }
-            }
-        }
+        _logger.LogInformation("LogOn:{logOn} execute the command:{command}", DateTime.Now.ToString("o"), command);
+
+        await _scheduleService
+            .ExecuteAsync(
+                command: schedulePullRecordCommand,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+
+        var schedule3RdPartyPullRecordCommand = new Schedule3rdPartyPullRecordCommand(
+            ApiUrl: command.GameApiUrl,
+            SecretKey: command.SecretKey,
+            Username: command.Username,
+            Password: command.Password,
+            StartDate: startDate,
+            EndDate: endDate);
+
+        _logger.LogInformation("LogOn:{logOn} execute the command:{command}", DateTime.Now.ToString("o"), command);
+
+        await _schedule3RdPartyService
+            .ExecuteAsync(
+                command: schedule3RdPartyPullRecordCommand,
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
     }
 }

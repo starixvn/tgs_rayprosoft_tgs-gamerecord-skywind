@@ -1,7 +1,7 @@
-﻿namespace Tgs.GameRecord.SkywindManualService;
+﻿namespace Tgs.GameRecord.SkywindService.Core.ApplicationServices;
 
-public record ManualMessageRequest(
-    Uri GameApiUrl,
+public record ManualPullRecordCommand(
+    Uri ApiUrl,
     string SecretKey,
     string Username,
     string Password,

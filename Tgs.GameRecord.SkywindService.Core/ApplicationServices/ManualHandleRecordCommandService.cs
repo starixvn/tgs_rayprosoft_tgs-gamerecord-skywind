@@ -70,7 +70,7 @@ internal class ManualHandleRecordCommandService : ICommandService<ManualHandleRe
             {
                 var status = RoundStatus.Closed;
                 var externalCreatedOn = record.ExternalCreatedOn.ToDateTimeOffset();
-                var externalClosedOn = record.ExternalCreatedOn.ToDateTimeOffset();
+                var externalClosedOn = record.ExternalClosedOn.ToDateTimeOffset();
                 var bet = record.Bet.ToDecimal().GetValueOrDefault(0);
                 var validBet = record.Bet.ToDecimal().GetValueOrDefault(0);
                 var settle = record.Settle.ToDecimal().GetValueOrDefault(0);

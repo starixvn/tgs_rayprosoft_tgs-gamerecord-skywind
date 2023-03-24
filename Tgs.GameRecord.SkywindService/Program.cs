@@ -5,7 +5,6 @@ using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using Tgs.GameRecord.FaChai.Messages;
 using Tgs.GameRecord.SkywindService.Messages;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -86,8 +85,7 @@ builder.Services
              var configuration = sp.GetRequiredService<IConfiguration>();
              options.Url = configuration.GetConnectionString("Nats")!;
          })
-         .AddHandler<ScheduleFormQueuedMessageHandler>(subject: "gp.gamerecord.scheduleform.swtf.queued", "gp.gamerecord.scheduleform.swtf")
-         .AddHandler<ScheduleMessageHandler>(subject: "gp.gamerecord.schedule.swtf", group: "gp.gamerecord.schedule");
+         .AddHandler<ScheduleFormQueuedMessageHandler>(subject: "gp.gamerecord.scheduleform.swtf.queued", "gp.gamerecord.scheduleform.swtf");
      })
      .ClearAllExchanges()
      .AddNatsGlobPatternExchange("*");
@@ -124,8 +122,7 @@ builder.Services
     .AddInterceptionService()
     .AddServiceUtiltiyInterceptors();
 
-builder.Services
-    .AddHealthChecks();
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 

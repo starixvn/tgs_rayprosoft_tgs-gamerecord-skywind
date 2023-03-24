@@ -1,7 +1,6 @@
 ﻿using Tgs.GameRecord.SkywindService.Core;
 using Tgs.GameRounds.Schedule.Common.Protos;
 using Tgs.MessageQueue;
-using Tgs.GameRecord.SkywindService.Messages;
 
 namespace Tgs.GameRecord.SkywindService.Messages;
 

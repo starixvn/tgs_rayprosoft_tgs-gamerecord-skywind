@@ -7,13 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameRecord.SkywindServi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameRecord.SkywindService.Core", "Tgs.GameRecord.SkywindService.Core\Tgs.GameRecord.SkywindService.Core.csproj", "{0435CA4D-D30F-48D6-9AC9-42C0A2F8AAA1}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "方案項目", "方案項目", "{B2751747-D25A-48ED-ADC7-B9C93525A597}"
-	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
-		CodeMaid.config = CodeMaid.config
-		nuget.config = nuget.config
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameRecord.SkywindService.Core.UnitTest", "Tgs.GameRecord.SkywindService.Core.UnitTest\Tgs.GameRecord.SkywindService.Core.UnitTest.csproj", "{05B15E2E-BA0D-45F8-999D-633FFFCC32DB}"
 EndProject
 Global

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using Tgs.GameRounds.Work.Client;
+using Tgs.GameRounds.Work.Manual.Client;
 using Tgs.GameRounds.Work.Manual.Common.Protos;
 using Tgs.ServiceUtility;
 

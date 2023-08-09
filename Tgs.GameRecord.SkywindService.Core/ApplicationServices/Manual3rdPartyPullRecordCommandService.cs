@@ -10,12 +10,12 @@ internal class Manual3rdPartyPullRecordCommandService : ICommandService<Manual3r
 {
     private readonly IGameInterfaceSkywindClient _client;
     private readonly ILogger<Manual3rdPartyPullRecordCommandService> _logger;
-    private readonly ICommandService<ManualHandleRecordCommand> _service;
+    private readonly ICommandService<HandleRecordCommand> _service;
 
     public Manual3rdPartyPullRecordCommandService(
         ILogger<Manual3rdPartyPullRecordCommandService> logger,
         IGameInterfaceSkywindClient client,
-        ICommandService<ManualHandleRecordCommand> service)
+        ICommandService<HandleRecordCommand> service)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _client = client ?? throw new ArgumentNullException(nameof(client));

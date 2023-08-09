@@ -1,28 +1,28 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.Logging;
-using Tgs.GameRounds.Work.Manual.Client;
-using Tgs.GameRounds.Work.Manual.Common.Protos;
+using Tgs.GameRounds.Work.Client;
+using Tgs.GameRounds.Work.Common.Protos;
 using Tgs.ServiceUtility;
 
 namespace Tgs.GameRecord.SkywindService.Core.ApplicationServices;
 
-internal class ManualHandleRecordCommandService : ICommandService<ManualHandleRecordCommand>
+internal class HandleRecordCommandService : ICommandService<HandleRecordCommand>
 {
-    private readonly ILogger<ManualHandleRecordCommandService> _logger;
+    private readonly ILogger<HandleRecordCommandService> _logger;
     private readonly IUtensil _utensil;
-    private readonly IGameRoundsWorkManualClient _workManualClient;
+    private readonly IGameRoundsWorkClient _workManualClient;
 
-    public ManualHandleRecordCommandService(
-        ILogger<ManualHandleRecordCommandService> logger,
+    public HandleRecordCommandService(
+        ILogger<HandleRecordCommandService> logger,
         IUtensil utensil,
-        IGameRoundsWorkManualClient workManualClient)
+        IGameRoundsWorkClient workManualClient)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _utensil = utensil ?? throw new ArgumentNullException(nameof(utensil));
         _workManualClient = workManualClient ?? throw new ArgumentNullException(nameof(workManualClient));
     }
 
-    public async ValueTask ExecuteAsync(ManualHandleRecordCommand command, CancellationToken cancellationToken = default)
+    public async ValueTask ExecuteAsync(HandleRecordCommand command, CancellationToken cancellationToken = default)
     {
         var gameProviderId = await _utensil
             .GetGameProviderIdAsync(

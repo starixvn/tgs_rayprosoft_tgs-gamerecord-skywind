@@ -1,6 +1,6 @@
 ﻿namespace Tgs.GameRecord.SkywindService.Core.ApplicationServices;
 
-public record ManualPullRecordCommand(
+public record PullRecordBy3rdPartyCommand(
     Uri ApiUrl,
     string SecretKey,
     string Username,

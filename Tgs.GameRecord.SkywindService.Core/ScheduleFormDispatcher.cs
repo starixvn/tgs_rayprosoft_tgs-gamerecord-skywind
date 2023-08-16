@@ -12,28 +12,22 @@ internal class ScheduleFormDispatcher : IScheduleFormDispatcher
 {
     private readonly IGameRoundsScheduleClient _clinet;
     private readonly ILogger<ScheduleFormDispatcher> _logger;
-    private readonly ICommandService<Manual3rdPartyPullRecordCommand> _manual3RdPartyService;
-    private readonly ICommandService<ManualPullRecordCommand> _manualService;
-    private readonly ICommandService<Schedule3rdPartyPullRecordCommand> _schedule3RdPartyService;
+    private readonly ICommandService<PullRecordBy3rdPartyCommand> _pulllRecord3rdPartyService;
     private readonly IScheduleFormLock _scheduleFormLock;
-    private readonly ICommandService<SchedulePullRecordCommand> _scheduleService;
+    private readonly ICommandService<PullRecordCommand> _service;
 
     public ScheduleFormDispatcher(
         ILogger<ScheduleFormDispatcher> logger,
         IGameRoundsScheduleClient clinet,
         IScheduleFormLock scheduleFormLock,
-        ICommandService<SchedulePullRecordCommand> scheduleService,
-        ICommandService<Schedule3rdPartyPullRecordCommand> schedule3rdPartyService,
-        ICommandService<ManualPullRecordCommand> manualService,
-        ICommandService<Manual3rdPartyPullRecordCommand> manual3rdPartyService)
+        ICommandService<PullRecordCommand> service,
+        ICommandService<PullRecordBy3rdPartyCommand> pulllRecord3rdPartyService)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _clinet = clinet ?? throw new ArgumentNullException(nameof(clinet));
         _scheduleFormLock = scheduleFormLock ?? throw new ArgumentNullException(nameof(scheduleFormLock));
-        _scheduleService = scheduleService ?? throw new ArgumentNullException(nameof(scheduleService));
-        _schedule3RdPartyService = schedule3rdPartyService ?? throw new ArgumentNullException(nameof(schedule3rdPartyService));
-        _manualService = manualService ?? throw new ArgumentNullException(nameof(manualService));
-        _manual3RdPartyService = manual3rdPartyService ?? throw new ArgumentNullException(nameof(manual3rdPartyService));
+        _service = service ?? throw new ArgumentNullException(nameof(service));
+        _pulllRecord3rdPartyService = pulllRecord3rdPartyService ?? throw new ArgumentNullException(nameof(pulllRecord3rdPartyService));
     }
 
     public async ValueTask ExecuteAsync(
@@ -79,9 +73,9 @@ internal class ScheduleFormDispatcher : IScheduleFormDispatcher
             var parameter = JsonSerializer.Deserialize<SkywindParameter>(scheduleForm.Parameters)
                 ?? throw new Exception($"This game provider ({gameProviderCode}) scheduling form parameter is null. ({id})");
 
-            if (scheduleForm.Source == ScheduleFormSource.Schedule)
+            try
             {
-                var command = new SchedulePullRecordCommand(
+                var command = new PullRecordCommand(
                     ApiUrl: new Uri(parameter.ApiUrl),
                     SecretKey: parameter.SecretKey,
                     Username: parameter.Username,
@@ -91,31 +85,20 @@ internal class ScheduleFormDispatcher : IScheduleFormDispatcher
 
                 _logger.LogInformation("LogOn:{logOn} execute the command:{command}", DateTime.Now.ToString("o"), command);
 
-                await _scheduleService
+                await _service
                     .ExecuteAsync(
                         command: command,
-                        cancellationToken: cancellationToken)
-                    .ConfigureAwait(false);
-
-                var schedule3RdPartyPullRecordCommand = new Schedule3rdPartyPullRecordCommand(
-                    ApiUrl: new Uri(parameter.ApiUrl),
-                    SecretKey: parameter.SecretKey,
-                    Username: parameter.Username,
-                    Password: parameter.Password,
-                    StartDate: parameter.StartTime.ToDateTimeOffset(),
-                    EndDate: parameter.EndTime.ToDateTimeOffset());
-
-                _logger.LogInformation("LogOn:{logOn} execute the command:{command}", DateTime.Now.ToString("o"), command);
-
-                await _schedule3RdPartyService
-                    .ExecuteAsync(
-                        command: schedule3RdPartyPullRecordCommand,
                         cancellationToken: cancellationToken)
                     .ConfigureAwait(false);
             }
-            else
+            catch (Exception ex)
             {
-                var command = new ManualPullRecordCommand(
+                _logger.LogError(ex, "LogOn:{logOn}  An exception occurred in the process of game account pulling.", DateTime.Now.ToString("o"));
+            }
+
+            try
+            {
+                var command = new PullRecordBy3rdPartyCommand(
                     ApiUrl: new Uri(parameter.ApiUrl),
                     SecretKey: parameter.SecretKey,
                     Username: parameter.Username,
@@ -125,27 +108,15 @@ internal class ScheduleFormDispatcher : IScheduleFormDispatcher
 
                 _logger.LogInformation("LogOn:{logOn} execute the command:{command}", DateTime.Now.ToString("o"), command);
 
-                await _manualService
+                await _pulllRecord3rdPartyService
                     .ExecuteAsync(
                         command: command,
                         cancellationToken: cancellationToken)
                     .ConfigureAwait(false);
-
-                var schedule3RdPartyPullRecordCommand = new Manual3rdPartyPullRecordCommand(
-                    ApiUrl: new Uri(parameter.ApiUrl),
-                    SecretKey: parameter.SecretKey,
-                    Username: parameter.Username,
-                    Password: parameter.Password,
-                    StartDate: parameter.StartTime.ToDateTimeOffset(),
-                    EndDate: parameter.EndTime.ToDateTimeOffset());
-
-                _logger.LogInformation("LogOn:{logOn} execute the command:{command}", DateTime.Now.ToString("o"), command);
-
-                await _manual3RdPartyService
-                    .ExecuteAsync(
-                        command: schedule3RdPartyPullRecordCommand,
-                        cancellationToken: cancellationToken)
-                    .ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "LogOn:{logOn}  An exception occurred in the 3rdParty game account opening process.", DateTime.Now.ToString("o"));
             }
 
             await _clinet

@@ -6,14 +6,14 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.GameRecord.SkywindService.Core.ApplicationServices;
 
-internal class Manual3rdPartyPullRecordCommandService : ICommandService<Manual3rdPartyPullRecordCommand>
+internal class PullRecordCommandService : ICommandService<PullRecordCommand>
 {
     private readonly IGameInterfaceSkywindClient _client;
-    private readonly ILogger<Manual3rdPartyPullRecordCommandService> _logger;
+    private readonly ILogger<PullRecordCommandService> _logger;
     private readonly ICommandService<HandleRecordCommand> _service;
 
-    public Manual3rdPartyPullRecordCommandService(
-        ILogger<Manual3rdPartyPullRecordCommandService> logger,
+    public PullRecordCommandService(
+        ILogger<PullRecordCommandService> logger,
         IGameInterfaceSkywindClient client,
         ICommandService<HandleRecordCommand> service)
     {
@@ -22,7 +22,7 @@ internal class Manual3rdPartyPullRecordCommandService : ICommandService<Manual3r
         _service = service ?? throw new ArgumentNullException(nameof(service));
     }
 
-    public async ValueTask ExecuteAsync(Manual3rdPartyPullRecordCommand command, CancellationToken cancellationToken = default)
+    public async ValueTask ExecuteAsync(PullRecordCommand command, CancellationToken cancellationToken = default)
     {
         var offset = 0;
         var limit = 1000;
@@ -41,7 +41,7 @@ internal class Manual3rdPartyPullRecordCommandService : ICommandService<Manual3r
                 Limit = limit
             };
             var gameHistoriesReply = await _client
-                .GameRecord3rdPartyAsync(
+                .GameRecordBySettleAsync(
                     request: gameRecordRequest,
                     cancellationToken: cancellationToken)
                 .ConfigureAwait(false);

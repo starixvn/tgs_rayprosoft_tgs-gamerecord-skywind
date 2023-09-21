@@ -1,4 +1,4 @@
-# tgs-gamerecord-skywind-service
+# tgs-gamerecord-skywind
 
 
 
@@ -15,14 +15,14 @@ Already a pro? Just edit this README.md and make it your own. Want to make it ea
 
 ```
 cd existing_repo
-git remote add origin https://gitlab.com/rayprosoft/tgs-gamerecord-skywind-service.git
+git remote add origin https://gitlab.com/rayprosoft/tgs-gamerecord-skywind.git
 git branch -M main
 git push -uf origin main
 ```
 
 ## Integrate with your tools
 
-- [ ] [Set up project integrations](https://gitlab.com/rayprosoft/tgs-gamerecord-skywind-service/-/settings/integrations)
+- [ ] [Set up project integrations](https://gitlab.com/rayprosoft/tgs-gamerecord-skywind/-/settings/integrations)
 
 ## Collaborate with your team
 

@@ -1,8 +1,8 @@
 variables:
-  ImageName: pgtgs/game-gamerecord-sw-service
-  SettingKey: game-gamerecord-sw-service
-  HelmTemplateFolderName: game-gamerecord-sw-service
-  BuildCacheKey: Tgs.GameRecord.SkywindService.$CI_PIPELINE_ID
+  ImageName: pgtgs/game-gamerecord-sw
+  SettingKey: game-gamerecord-sw
+  HelmTemplateFolderName: game-gamerecord-sw
+  BuildCacheKey: Tgs.GameRecord.Skywind.$CI_PIPELINE_ID
 
 default:
   before_script:
@@ -59,7 +59,7 @@ push-docker-image:
     untracked: true   
     policy: pull
   script:
-    - dotnet build "Tgs.GameRecord.SkywindService/Tgs.GameRecord.SkywindService.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:$Tag" --no-restore
+    - dotnet build "Tgs.GameRecord.Skywind/Tgs.GameRecord.Skywind.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:$Tag" --no-restore
     - docker push $ImageName:$Tag
 
 push-k8s-template:

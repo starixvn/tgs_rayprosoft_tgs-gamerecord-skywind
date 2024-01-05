@@ -5,5 +5,5 @@ public record PullRecordBy3rdPartyCommand(
     string SecretKey,
     string Username,
     string Password,
-    DateTimeOffset StartDate,
-    DateTimeOffset EndDate);
+    DateTimeOffset StartTime,
+    DateTimeOffset EndTime);

@@ -1,62 +1,45 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Text;
+using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Tgs.GameRounds.Schedule.Client;
-using Tgs.GameRounds.Schedule.Protos;
+using Tgs.GameRecord.PragmaticPlay.Common;
 using Tgs.ServiceUtility;
+using Valhalla.MessageQueue;
 
 namespace Tgs.GameRecord.Skywind.Core.JobApplicationServices;
 
-internal class JobExecuteCommandService : ICommandService<JobExecuteCommand>
+internal class JobExecuteCommandService(
+    ILogger<JobExecuteCommandService> logger,
+    IOptions<GameRecordInfoOptions> options,
+    IMessageSender messageSender) : ICommandService<JobExecuteCommand>
 {
-    private readonly IGameRoundsScheduleClient _client;
-    private readonly GameRecordInfoOptions _gameRecordInfo;
-    private readonly double _intervalMinutes;
-    private readonly ILogger<JobExecuteCommandService> _logger;
-
-    public JobExecuteCommandService(
-        ILogger<JobExecuteCommandService> logger,
-        IOptions<GameRecordInfoOptions> options,
-        IGameRoundsScheduleClient client)
-    {
-        _gameRecordInfo = options.Value;
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _client = client ?? throw new ArgumentNullException(nameof(client));
-        _intervalMinutes = _gameRecordInfo.IntervalMinutesMax < _gameRecordInfo.IntervalMinutes
-            ? _gameRecordInfo.IntervalMinutesMax
-            : _gameRecordInfo.IntervalMinutesMinimum > _gameRecordInfo.IntervalMinutes
-            ? _gameRecordInfo.IntervalMinutesMinimum
-            : _gameRecordInfo.IntervalMinutes;
-    }
+    private readonly double _intervalMinutes = options.Value.IntervalMinutesMax < options.Value.IntervalMinutes
+        ? options.Value.IntervalMinutesMax
+        : options.Value.IntervalMinutesMinimum > options.Value.IntervalMinutes
+        ? options.Value.IntervalMinutesMinimum
+        : options.Value.IntervalMinutes;
 
     public ValueTask ExecuteAsync(JobExecuteCommand command, CancellationToken cancellationToken = default)
     {
         var endTime = DateTimeOffset.ParseExact(DateTimeOffset.UtcNow.ToString(@"yyyy-MM-dd\THH:mm:00K"), @"yyyy-MM-dd\THH:mm:ssK", null, styles: System.Globalization.DateTimeStyles.RoundtripKind);
         var startTime = endTime.AddMinutes(_intervalMinutes * -1);
 
-        var parameters = new
+        var parameters = new SkywindGameRecordMessage
         {
-            command.ApiUrl,
-            command.SecretKey,
-            command.Username,
-            command.Password,
+            ApiUrl = command.ApiUrl,
+            SecretKey = command.SecretKey,
+            Username = command.Username,
+            Password = command.Password,
             StartTime = startTime,
             EndTime = endTime
         };
 
-        _logger.LogDebug("LogOn:{logOn} Parameters:{parameters}", DateTime.Now.ToString("u"), parameters);
+        logger.LogDebug("LogOn:{logOn} Parameters:{parameters}", DateTime.Now.ToString("u"), parameters);
 
-        return _client
-            .Skywind_ScheduleFormQueuedAsync(
-            gameProviderCode: command.GameProviderCode,
-            name: command.Name,
-            subject: "gp.gamerecord.scheduleform.swtf.queued",
-            source: ScheduleFormSource.Schedule,
-            apiUrl: parameters.ApiUrl,
-            secretKey: parameters.SecretKey,
-            username: parameters.Username,
-            password: parameters.Password,
-            startTime: parameters.StartTime,
-            endTime: parameters.EndTime,
+        return messageSender
+            .PublishAsync(
+            subject: SkywindNatsConst.SchedulePublish,
+            data: Encoding.UTF8.GetBytes(JsonSerializer.Serialize(parameters)),
             cancellationToken: cancellationToken);
     }
 }

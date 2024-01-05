@@ -8,14 +8,14 @@ data:
   appsettings.json: |
     {
       "Logging": {
-         "LogLevel": {
-          "Default": "Warning"
-          }
+        "LogLevel": {
+          "Default": "Warning",
+          "Tgs.GameRecord.Skywind.Messages": "Information"
+        }
       },
       "GameRecord": {
         "GameCommandClientBaseUrl": "http://game-gamecommand/",
-        "GameRoundsScheduleClientBaseUrl": "http://game-gamerounds-schedule:9090/",
-        "GameInterfaceClientBaseUrl": "http://game-gameinterface-sw-service:9090/"
+        "GameInterfaceClientBaseUrl": "dns:///game-gameinterface-sw-service:9090/"
       }
     }
   otel-collector-config.yaml: |

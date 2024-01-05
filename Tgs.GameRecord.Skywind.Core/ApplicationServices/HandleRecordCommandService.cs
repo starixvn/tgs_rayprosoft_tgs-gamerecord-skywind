@@ -5,18 +5,11 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.GameRecord.Skywind.Core.ApplicationServices;
 
-internal class HandleRecordCommandService : ICommandService<HandleRecordCommand>
+internal class HandleRecordCommandService(
+    IOptions<GameRecordInfoOptions> options,
+    IGameRecordHandleClient client) : ICommandService<HandleRecordCommand>
 {
-    private readonly IGameRecordHandleClient _client;
-    private readonly GameRecordInfoOptions _gameRecordInfo;
-
-    public HandleRecordCommandService(
-        IOptions<GameRecordInfoOptions> options,
-        IGameRecordHandleClient client)
-    {
-        _gameRecordInfo = options.Value;
-        _client = client ?? throw new ArgumentNullException(nameof(client));
-    }
+    private readonly GameRecordInfoOptions _gameRecordInfo = options.Value;
 
     public ValueTask ExecuteAsync(HandleRecordCommand command, CancellationToken cancellationToken = default)
     {
@@ -30,7 +23,7 @@ internal class HandleRecordCommandService : ICommandService<HandleRecordCommand>
         var winLoss = command.GameRecord.PlayerWinLoss.ToDecimal().GetValueOrDefault(0);
         var wagerState = winLoss <= 0 ? WagerStates.Lose : WagerStates.Win;
 
-        return _client
+        return client
             .MessageAsync(
             gameProviderCode: _gameRecordInfo.GameProviderCode,
             playerCode: command.GameRecord.PlayerCode,

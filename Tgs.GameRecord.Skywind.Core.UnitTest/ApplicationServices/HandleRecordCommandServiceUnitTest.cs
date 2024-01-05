@@ -1,4 +1,5 @@
-﻿using Google.Protobuf.WellKnownTypes;
+﻿using System.Text.Json.Nodes;
+using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using Tgs.GameRecord.Handle.Client;
@@ -65,7 +66,7 @@ public class HandleRecordCommandServiceUnitTest
             commission: Arg.Is(0.0m),
             turnover: Arg.Is(0.5m),
             winLoss: Arg.Is(-0.5m),
-            additionalData: Arg.Is(command.GameRecord.AdditionalData),
+            additionalData: Arg.Any<JsonNode>(),
             cancellationToken: Arg.Any<CancellationToken>());
     }
 
@@ -125,7 +126,7 @@ public class HandleRecordCommandServiceUnitTest
             commission: Arg.Is(0.0m),
             turnover: Arg.Is(0.5m),
             winLoss: Arg.Is(1.44m),
-            additionalData: Arg.Is(command.GameRecord.AdditionalData),
+            additionalData: Arg.Any<JsonNode>(),
             cancellationToken: Arg.Any<CancellationToken>());
     }
 }

@@ -11,71 +11,71 @@ namespace Tgs.GameRecord.Skywind.Core.JobApplicationServices;
 
 internal class JobInitCommandService : ICommandService<JobInitCommand>
 {
-    private readonly IGameCommandClient _client;
-    private readonly GameRecordInfoOptions _gameRecordInfo;
-    private readonly ILogger<JobInitCommandService> _logger;
-    private readonly RecurringJobOptions _recurringJobOptions;
+	private readonly IGameCommandClient _client;
+	private readonly GameRecordInfoOptions _gameRecordInfo;
+	private readonly ILogger<JobInitCommandService> _logger;
+	private readonly RecurringJobOptions _recurringJobOptions;
 
-    public JobInitCommandService(
-        ILogger<JobInitCommandService> logger,
-        IOptions<GameRecordInfoOptions> options,
-        IGameCommandClient client)
-    {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _gameRecordInfo = options.Value;
-        _client = client ?? throw new ArgumentNullException(nameof(client));
-        _recurringJobOptions = new RecurringJobOptions()
-        {
-            TimeZone = TimeZoneInfo.FindSystemTimeZoneById(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "China Standard Time" : "Asia/Shanghai")
-        };
-    }
+	public JobInitCommandService(
+		ILogger<JobInitCommandService> logger,
+		IOptions<GameRecordInfoOptions> options,
+		IGameCommandClient client)
+	{
+		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
+		_gameRecordInfo = options.Value;
+		_client = client ?? throw new ArgumentNullException(nameof(client));
+		_recurringJobOptions = new RecurringJobOptions()
+		{
+			TimeZone = TimeZoneInfo.FindSystemTimeZoneById(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "China Standard Time" : "Asia/Shanghai")
+		};
+	}
 
-    public async ValueTask ExecuteAsync(JobInitCommand command, CancellationToken cancellationToken = default)
-    {
-        using (var connection = JobStorage.Current.GetConnection())
-        {
-            foreach (var recurringJob in connection.GetRecurringJobs())
-            {
-                RecurringJob.RemoveIfExists(recurringJob.Id);
-            }
-        }
+	public async ValueTask ExecuteAsync(JobInitCommand command, CancellationToken cancellationToken = default)
+	{
+		using (var connection = JobStorage.Current.GetConnection())
+		{
+			foreach (var recurringJob in connection.GetRecurringJobs())
+			{
+				RecurringJob.RemoveIfExists(recurringJob.Id);
+			}
+		}
 
-        try
-        {
-            var settingConfiguration = await _client
-                .SettingGetConfigurationStringAsync(
-                key: _gameRecordInfo.GameProviderConfiguration,
-                cancellationToken: cancellationToken)
-                .ConfigureAwait(false)
-                ?? throw new Exception($"This game product setting does not exist.({_gameRecordInfo.GameProviderConfiguration})");
+		try
+		{
+			var settingConfiguration = await _client
+				.SettingGetConfigurationStringAsync(
+				key: _gameRecordInfo.GameProviderConfiguration,
+				cancellationToken: cancellationToken)
+				.ConfigureAwait(false)
+				?? throw new Exception($"This game product setting does not exist.({_gameRecordInfo.GameProviderConfiguration})");
 
-            var settingConfigurationJson = JsonNode.Parse(settingConfiguration)
-                ?? throw new Exception($"This game product setting does not exist.({_gameRecordInfo.GameProviderConfiguration})");
+			var settingConfigurationJson = JsonNode.Parse(settingConfiguration)
+				?? throw new Exception($"This game product setting does not exist.({_gameRecordInfo.GameProviderConfiguration})");
 
-            var jobExecuteCommand = new JobExecuteCommand(
-                GameProviderCode: _gameRecordInfo.GameProviderCode,
-                Name: _gameRecordInfo.GameProviderConfiguration,
-                ApiUrl: new Uri(settingConfigurationJson["ApiUrl"]!.ToString()),
-                SecretKey: settingConfigurationJson["SecretKey"]!.ToString(),
-                Username: settingConfigurationJson["Username"]!.ToString(),
-                Password: settingConfigurationJson["Password"]!.ToString());
+			var jobExecuteCommand = new JobExecuteCommand(
+				GameProviderCode: _gameRecordInfo.GameProviderCode,
+				Name: _gameRecordInfo.GameProviderConfiguration,
+				ApiUrl: new Uri(settingConfigurationJson["ApiUrl"]!.ToString()),
+				SecretKey: settingConfigurationJson["SecretKey"]!.ToString(),
+				Username: settingConfigurationJson["Username"]!.ToString(),
+				Password: settingConfigurationJson["Password"]!.ToString());
 
-            RecurringJob.AddOrUpdate<IHangfireUtensil>(
-                recurringJobId: _gameRecordInfo.GameProviderConfiguration,
-                methodCall: service => service.JobExecuteAsync(jobExecuteCommand),
-                cronExpression: Cron.Minutely(),
-                options: _recurringJobOptions);
+			RecurringJob.AddOrUpdate<IHangfireUtensil>(
+				recurringJobId: _gameRecordInfo.GameProviderConfiguration,
+				methodCall: service => service.JobExecuteAsync(jobExecuteCommand),
+				cronExpression: Cron.Minutely(),
+				options: _recurringJobOptions);
 
-            //初始化強制第一次處理
-            _ = BackgroundJob.Enqueue<IHangfireUtensil>(service => service.JobExecuteAsync(jobExecuteCommand));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "LogOn:{logOn} Message:遊戲廠商初始化排程發生例外", DateTime.Now.ToString("o"));
-        }
-        finally
-        {
-            _ = BackgroundJob.Schedule<IHangfireUtensil>(service => service.JobCheckAsync(), TimeSpan.FromMinutes(1));
-        }
-    }
+			//初始化強制第一次處理
+			_ = BackgroundJob.Enqueue<IHangfireUtensil>(service => service.JobExecuteAsync(jobExecuteCommand));
+		}
+		catch (Exception ex)
+		{
+			_logger.LogError(ex, "LogOn:{logOn} Message:遊戲廠商初始化排程發生例外", DateTime.Now.ToString("o"));
+		}
+		finally
+		{
+			_ = BackgroundJob.Schedule<IHangfireUtensil>(service => service.JobCheckAsync(), TimeSpan.FromMinutes(1));
+		}
+	}
 }

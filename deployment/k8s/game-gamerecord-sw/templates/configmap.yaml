@@ -10,7 +10,8 @@ data:
       "Logging": {
         "LogLevel": {
           "Default": "Warning",
-          "Tgs.GameRecord.Skywind.Messages": "Information"
+          "Tgs.GameRecord.Skywind.Messages": "Information",
+          "Tgs.GameRecord.Skywind.Core.ApplicationServices.HandleRecordCommandService": "Information"
         }
       },
       "GameRecord": {

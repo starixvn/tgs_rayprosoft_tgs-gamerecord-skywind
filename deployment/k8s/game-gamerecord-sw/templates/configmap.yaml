@@ -10,8 +10,9 @@ data:
       "Logging": {
         "LogLevel": {
           "Default": "Warning",
-          "Grpc.Net.Client.Balancer": "Debug",
-          "Tgs.GameRecord.Skywind.Messages.ManualMessageHandler": "Warning",
+          "Grpc.Net.Client.Balancer": "Warning",
+          "Grpc.Net.Client.Balancer.DnsResolver": "Debug",
+          "Tgs.GameRecord.Skywind.Messages.ManualMessageHandler": "Information",
           "Tgs.GameRecord.Skywind.Messages.ScheduleMessageHandler": "Warning",
           "Tgs.GameRecord.Skywind.Core.ApplicationServices.HandleRecordCommandService": "Warning"
         }

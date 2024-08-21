@@ -1,4 +1,4 @@
-﻿namespace Tgs.GameRecord.Skywind.Core;
+﻿namespace Tgs.GameRecord.Skywind;
 
 public record RedisOptions
 {

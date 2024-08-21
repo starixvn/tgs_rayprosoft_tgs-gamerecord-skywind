@@ -1,4 +1,4 @@
-﻿namespace Tgs.GameRecord.PragmaticPlay.Common;
+﻿namespace Tgs.GameRecord.Skywind.Common;
 
 public record SkywindNatsConst
 {

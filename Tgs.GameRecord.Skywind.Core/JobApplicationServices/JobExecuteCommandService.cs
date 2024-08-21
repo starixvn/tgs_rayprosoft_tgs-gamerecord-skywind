@@ -2,15 +2,16 @@
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Tgs.GameRecord.PragmaticPlay.Common;
 using Tgs.ServiceUtility;
 using Valhalla.MessageQueue;
+using Tgs.GameRecord.Skywind.Common;
 
 namespace Tgs.GameRecord.Skywind.Core.JobApplicationServices;
 
 internal class JobExecuteCommandService(
 	ILogger<JobExecuteCommandService> logger,
 	IOptions<GameRecordInfoOptions> options,
+	TimeProvider timeProvider,
 	IMessageSender messageSender) : ICommandService<JobExecuteCommand>
 {
 	private readonly double _intervalMinutes = options.Value.IntervalMinutesMax < options.Value.IntervalMinutes
@@ -21,10 +22,11 @@ internal class JobExecuteCommandService(
 
 	public ValueTask ExecuteAsync(JobExecuteCommand command, CancellationToken cancellationToken = default)
 	{
-		var endTime = DateTimeOffset.ParseExact(DateTimeOffset.UtcNow.ToString(@"yyyy-MM-dd\THH:mm:00K"), @"yyyy-MM-dd\THH:mm:ssK", null, styles: System.Globalization.DateTimeStyles.RoundtripKind);
+		var currentTime = timeProvider.GetUtcNow();
+		var endTime = DateTimeOffset.ParseExact(currentTime.ToString(@"yyyy-MM-dd\THH:mm:00K"), @"yyyy-MM-dd\THH:mm:ssK", null, styles: System.Globalization.DateTimeStyles.RoundtripKind);
 		var startTime = endTime.AddMinutes(_intervalMinutes * -1);
 
-		var parameters = new SkywindGameRecordMessage
+		var message = new SkywindGameRecordMessage
 		{
 			ApiUrl = command.ApiUrl,
 			SecretKey = command.SecretKey,
@@ -34,12 +36,27 @@ internal class JobExecuteCommandService(
 			EndTime = endTime
 		};
 
-		logger.LogDebug("LogOn:{logOn} Parameters:{parameters}", DateTime.Now.ToString("u"), parameters);
+		logger.LogInformation("{logInformation}",
+			JsonSerializer.Serialize(new
+			{
+				LogOn = DateTime.Now.ToString("u"),
+				Subject = SkywindNatsConst.SchedulePublish,
+				Data = new
+				{
+					command.ApiUrl,
+					command.SecretKey,
+					command.Username,
+					command.Password,
+					StartTime = message.StartTime.ToString("u"),
+					EndTime = message.EndTime.ToString("u")
+				},
+				Message = "This message publishing handler."
+			}));
 
 		return messageSender
 			.PublishAsync(
 			subject: SkywindNatsConst.SchedulePublish,
-			data: Encoding.UTF8.GetBytes(JsonSerializer.Serialize(parameters)),
+			data: JsonSerializer.SerializeToUtf8Bytes(message),
 			cancellationToken: cancellationToken);
 	}
 }

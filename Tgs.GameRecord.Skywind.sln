@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameRecord.Skywind.Core
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameRecord.Skywind.Core.UnitTest", "Tgs.GameRecord.Skywind.Core.UnitTest\Tgs.GameRecord.Skywind.Core.UnitTest.csproj", "{F6EB354F-BCBF-47A3-A2D0-B553B9A5E24C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tgs.GameRecord.Skywind.Common", "Tgs.GameRecord.Skywind.Common\Tgs.GameRecord.Skywind.Common.csproj", "{80CE46E8-11ED-440B-BCDA-BF45CBF9C40A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameRecord.Skywind.Common", "Tgs.GameRecord.Skywind.Common\Tgs.GameRecord.Skywind.Common.csproj", "{80CE46E8-11ED-440B-BCDA-BF45CBF9C40A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tgs.GameRecord.Skywind.Repositories", "Tgs.GameRecord.Skywind.Repositories\Tgs.GameRecord.Skywind.Repositories.csproj", "{051C0126-A783-4BE1-ABEF-80705E2EB692}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{80CE46E8-11ED-440B-BCDA-BF45CBF9C40A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80CE46E8-11ED-440B-BCDA-BF45CBF9C40A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80CE46E8-11ED-440B-BCDA-BF45CBF9C40A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{051C0126-A783-4BE1-ABEF-80705E2EB692}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{051C0126-A783-4BE1-ABEF-80705E2EB692}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{051C0126-A783-4BE1-ABEF-80705E2EB692}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{051C0126-A783-4BE1-ABEF-80705E2EB692}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

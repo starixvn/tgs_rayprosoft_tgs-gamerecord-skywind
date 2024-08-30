@@ -121,7 +121,8 @@ builder.Services
 		.AddHandler<ScheduleMessageHandler>(SkywindNatsConst.SchedulePublish, SkywindNatsConst.SchedulePublish)
 		.AddHandler<ManualMessageHandler>(SkywindNatsConst.ManualPublish, SkywindNatsConst.ManualPublish))
 	.ClearAllExchanges()
-	.AddNatsGlobPatternExchange("*");
+	.AddNatsGlobPatternExchange(SkywindNatsConst.SchedulePublish)
+	.AddNatsGlobPatternExchange(SkywindNatsConst.ManualPublish);
 
 builder.Services
 	.AddOpenTelemetry()
